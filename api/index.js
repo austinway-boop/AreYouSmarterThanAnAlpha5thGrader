@@ -23,8 +23,8 @@ app.use(
 let dbReady = false;
 initDB().then(() => { dbReady = true; }).catch(console.error);
 
-const CLIENT_ID = process.env.TWITTER_CLIENT_ID;
-const CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET;
+const CLIENT_ID = process.env.TWITTER_CLIENT_ID || process.env.TWITTER_CONSUMER_KEY;
+const CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET || process.env.TWITTER_CONSUMER_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
 function base64url(buf) {
@@ -39,6 +39,8 @@ app.get("/api/auth/twitter", (req, res) => {
 
   req.session.oauthState = state;
   req.session.codeVerifier = codeVerifier;
+
+  console.log("OAuth start - CLIENT_ID present:", !!CLIENT_ID, "CALLBACK_URL:", CALLBACK_URL);
 
   const params = new URLSearchParams({
     response_type: "code",
