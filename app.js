@@ -22,6 +22,67 @@
     ended: false,
   };
 
+  // ═══════════ I18N ═══════════
+
+  const UI_STRINGS = {
+    en: { chalkLine1: "Are you smarter than a", chalkLine2: "5th Grader", chalkLine3: "@ Alpha?", continue: "Continue", submit: "Submit", noCalc: "No calculator", sciCalc: "Scientific calc OK", graphCalc: "Graphing calc OK", placeholder: "Type your answer...", performAt: "Alpha students perform at", estGlobal: "An est. {pct} of the world population cannot perform at this level", dataMethod: "Data & Methodology", fullMethod: "Full methodology", playAgain: "Play Again", postX: "Post to X", saveImg: "↓ Save Image", scored: "How was this scored?", letsFind: "Let's Find Out", handle: "Your X handle", language: "Language", recentAttempts: "RECENT ATTEMPTS" },
+    es: { chalkLine1: "¿Eres más listo que un", chalkLine2: "alumno de 5°", chalkLine3: "de Alpha?", continue: "Continuar", submit: "Enviar", noCalc: "Sin calculadora", sciCalc: "Calculadora científica OK", graphCalc: "Calculadora gráfica OK", placeholder: "Escribe tu respuesta...", performAt: "Los estudiantes Alpha rinden a nivel de", estGlobal: "Aprox. el {pct} de la población mundial no puede rendir a este nivel", dataMethod: "Datos y Metodología", fullMethod: "Metodología completa", playAgain: "Jugar de nuevo", postX: "Publicar en X", saveImg: "↓ Guardar imagen", scored: "¿Cómo se calificó?", letsFind: "Descúbrelo", handle: "Tu usuario de X", language: "Idioma", recentAttempts: "INTENTOS RECIENTES" },
+    fr: { chalkLine1: "Es-tu plus intelligent qu'un", chalkLine2: "élève de CM2", chalkLine3: "chez Alpha ?", continue: "Continuer", submit: "Soumettre", noCalc: "Pas de calculatrice", sciCalc: "Calculatrice scientifique OK", graphCalc: "Calculatrice graphique OK", placeholder: "Tapez votre réponse...", performAt: "Les élèves Alpha performent au niveau de", estGlobal: "Env. {pct} de la population mondiale ne peut pas atteindre ce niveau", dataMethod: "Données et Méthodologie", fullMethod: "Méthodologie complète", playAgain: "Rejouer", postX: "Publier sur X", saveImg: "↓ Sauvegarder", scored: "Comment c'est noté ?", letsFind: "Découvrons", handle: "Votre pseudo X", language: "Langue", recentAttempts: "TENTATIVES RÉCENTES" },
+    de: { chalkLine1: "Bist du schlauer als ein", chalkLine2: "Fünftklässler", chalkLine3: "bei Alpha?", continue: "Weiter", submit: "Absenden", noCalc: "Kein Taschenrechner", sciCalc: "Wissenschaftlicher TR OK", graphCalc: "Grafik-TR OK", placeholder: "Antwort eingeben...", performAt: "Alpha-Schüler leisten auf dem Niveau von", estGlobal: "Ca. {pct} der Weltbevölkerung kann dieses Niveau nicht erreichen", dataMethod: "Daten & Methodik", fullMethod: "Vollständige Methodik", playAgain: "Nochmal spielen", postX: "Auf X posten", saveImg: "↓ Bild speichern", scored: "Wie wurde bewertet?", letsFind: "Finden wir's heraus", handle: "Dein X-Handle", language: "Sprache", recentAttempts: "LETZTE VERSUCHE" },
+    pt: { chalkLine1: "Você é mais esperto que um", chalkLine2: "aluno do 5° ano", chalkLine3: "da Alpha?", continue: "Continuar", submit: "Enviar", noCalc: "Sem calculadora", sciCalc: "Calculadora científica OK", graphCalc: "Calculadora gráfica OK", placeholder: "Digite sua resposta...", performAt: "Alunos Alpha performam no nível de", estGlobal: "Aprox. {pct} da população mundial não consegue performar neste nível", dataMethod: "Dados e Metodologia", fullMethod: "Metodologia completa", playAgain: "Jogar novamente", postX: "Postar no X", saveImg: "↓ Salvar imagem", scored: "Como foi pontuado?", letsFind: "Vamos descobrir", handle: "Seu @ do X", language: "Idioma", recentAttempts: "TENTATIVAS RECENTES" },
+    zh: { chalkLine1: "你比Alpha的", chalkLine2: "五年级学生", chalkLine3: "更聪明吗？", continue: "继续", submit: "提交", noCalc: "不能使用计算器", sciCalc: "允许科学计算器", graphCalc: "允许图形计算器", placeholder: "输入你的答案...", performAt: "Alpha学生的表现水平为", estGlobal: "全球约{pct}的人口无法达到这个水平", dataMethod: "数据与方法论", fullMethod: "完整方法论", playAgain: "再玩一次", postX: "发布到X", saveImg: "↓ 保存图片", scored: "如何评分？", letsFind: "来试试", handle: "你的X账号", language: "语言", recentAttempts: "最近尝试" },
+    ja: { chalkLine1: "Alphaの", chalkLine2: "5年生", chalkLine3: "より賢い？", continue: "続ける", submit: "送信", noCalc: "電卓禁止", sciCalc: "関数電卓OK", graphCalc: "グラフ電卓OK", placeholder: "答えを入力...", performAt: "Alphaの生徒のレベル：", estGlobal: "世界人口の約{pct}がこのレベルに達していません", dataMethod: "データと方法論", fullMethod: "詳細な方法論", playAgain: "もう一度", postX: "Xに投稿", saveImg: "↓ 画像保存", scored: "採点方法", letsFind: "挑戦する", handle: "X アカウント", language: "言語", recentAttempts: "最近の挑戦" },
+    ko: { chalkLine1: "Alpha의", chalkLine2: "5학년", chalkLine3: "보다 똑똑한가?", continue: "계속", submit: "제출", noCalc: "계산기 없음", sciCalc: "공학 계산기 OK", graphCalc: "그래프 계산기 OK", placeholder: "답을 입력하세요...", performAt: "Alpha 학생들의 수준:", estGlobal: "세계 인구의 약 {pct}가 이 수준에 도달하지 못합니다", dataMethod: "데이터 및 방법론", fullMethod: "전체 방법론", playAgain: "다시 플레이", postX: "X에 게시", saveImg: "↓ 이미지 저장", scored: "채점 방법", letsFind: "알아보자", handle: "X 핸들", language: "언어", recentAttempts: "최근 시도" },
+    ar: { chalkLine1: "هل أنت أذكى من", chalkLine2: "طالب صف خامس", chalkLine3: "في ألفا؟", continue: "متابعة", submit: "إرسال", noCalc: "بدون آلة حاسبة", sciCalc: "آلة حاسبة علمية مسموح", graphCalc: "آلة حاسبة بيانية مسموح", placeholder: "اكتب إجابتك...", performAt: "طلاب ألفا يؤدون بمستوى", estGlobal: "ما يقدر بـ {pct} من سكان العالم لا يستطيعون الأداء بهذا المستوى", dataMethod: "البيانات والمنهجية", fullMethod: "المنهجية الكاملة", playAgain: "العب مرة أخرى", postX: "نشر على X", saveImg: "↓ حفظ الصورة", scored: "كيف تم التقييم؟", letsFind: "لنكتشف", handle: "حسابك على X", language: "اللغة", recentAttempts: "المحاولات الأخيرة" },
+    hi: { chalkLine1: "क्या आप Alpha के", chalkLine2: "5वीं कक्षा", chalkLine3: "के छात्र से होशियार हैं?", continue: "जारी रखें", submit: "जमा करें", noCalc: "कैलकुलेटर नहीं", sciCalc: "वैज्ञानिक कैलकुलेटर OK", graphCalc: "ग्राफिंग कैलकुलेटर OK", placeholder: "अपना उत्तर टाइप करें...", performAt: "Alpha छात्र इस स्तर पर प्रदर्शन करते हैं:", estGlobal: "विश्व जनसंख्या का अनु. {pct} इस स्तर पर प्रदर्शन नहीं कर सकता", dataMethod: "डेटा और कार्यप्रणाली", fullMethod: "पूर्ण कार्यप्रणाली", playAgain: "फिर से खेलें", postX: "X पर पोस्ट करें", saveImg: "↓ छवि सहेजें", scored: "स्कोर कैसे हुआ?", letsFind: "पता करें", handle: "आपका X हैंडल", language: "भाषा", recentAttempts: "हाल के प्रयास" },
+    ru: { chalkLine1: "Ты умнее", chalkLine2: "пятиклассника", chalkLine3: "из Alpha?", continue: "Продолжить", submit: "Отправить", noCalc: "Без калькулятора", sciCalc: "Научный калькулятор OK", graphCalc: "Графический калькулятор OK", placeholder: "Введите ответ...", performAt: "Ученики Alpha работают на уровне", estGlobal: "Ок. {pct} населения мира не может достичь этого уровня", dataMethod: "Данные и методология", fullMethod: "Полная методология", playAgain: "Играть снова", postX: "Опубликовать в X", saveImg: "↓ Сохранить", scored: "Как оценивалось?", letsFind: "Узнаем", handle: "Ваш X", language: "Язык", recentAttempts: "ПОСЛЕДНИЕ ПОПЫТКИ" },
+    tr: { chalkLine1: "Alpha'daki bir", chalkLine2: "5. sınıf öğrencisinden", chalkLine3: "daha mı akıllısın?", continue: "Devam", submit: "Gönder", noCalc: "Hesap makinesi yok", sciCalc: "Bilimsel hesap makinesi OK", graphCalc: "Grafik hesap makinesi OK", placeholder: "Cevabınızı yazın...", performAt: "Alpha öğrencileri şu seviyede performans gösteriyor:", estGlobal: "Dünya nüfusunun tahminen {pct}'i bu seviyede performans gösteremiyor", dataMethod: "Veri ve Metodoloji", fullMethod: "Tam metodoloji", playAgain: "Tekrar oyna", postX: "X'e gönder", saveImg: "↓ Resmi kaydet", scored: "Nasıl puanlandı?", letsFind: "Öğrenelim", handle: "X kullanıcı adınız", language: "Dil", recentAttempts: "SON DENEMELER" },
+  };
+
+  let currentLang = "en";
+  let userHandle = "";
+
+  function t(key) {
+    return (UI_STRINGS[currentLang] || UI_STRINGS.en)[key] || UI_STRINGS.en[key] || key;
+  }
+
+  function setChalkText(line1, line2, line3) {
+    [["#chalk-line-1", line1], ["#chalk-line-2", line2], ["#chalk-line-3", line3]].forEach(([sel, text]) => {
+      const el = $(sel);
+      el.innerHTML = "";
+      [...text].forEach(ch => {
+        const span = document.createElement("span");
+        span.className = ch === " " ? "chalk-char space" : "chalk-char";
+        span.textContent = ch === " " ? "\u00A0" : ch;
+        span.style.animationDelay = "0ms";
+        el.appendChild(span);
+      });
+    });
+  }
+
+  function applyLang() {
+    currentLang = $("#lang-select").value;
+    setChalkText(t("chalkLine1"), t("chalkLine2"), t("chalkLine3"));
+    $("#btn-start").textContent = t("letsFind");
+    $(".lb-label").textContent = t("recentAttempts");
+    $('[for="x-handle"]').textContent = t("handle");
+    $('[for="lang-select"]').textContent = t("language");
+    $("#free-input").placeholder = t("placeholder");
+    $("#btn-submit-free").textContent = t("submit");
+    $("#gt-continue").textContent = t("continue");
+    $("#btn-restart").textContent = t("playAgain");
+    $(".methodology summary").textContent = t("scored");
+  }
+
+  $("#lang-select").addEventListener("change", applyLang);
+
+  $("#x-handle").addEventListener("input", () => {
+    $("#btn-start").disabled = !$("#x-handle").value.trim();
+  });
+  $("#x-handle").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && $("#x-handle").value.trim()) $("#btn-start").click();
+  });
+
   let chalkAnimId = null;
   let chalkDone = false;
 
@@ -170,68 +231,6 @@
 
   // auto-run on load
   runChalkAnimation();
-
-  // ═══════════ I18N ═══════════
-
-  const UI_STRINGS = {
-    en: { chalkLine1: "Are you smarter than a", chalkLine2: "5th Grader", chalkLine3: "@ Alpha?", continue: "Continue", submit: "Submit", noCalc: "No calculator", sciCalc: "Scientific calc OK", graphCalc: "Graphing calc OK", placeholder: "Type your answer...", performAt: "Alpha students perform at", estGlobal: "An est. {pct} of the world population cannot perform at this level", dataMethod: "Data & Methodology", fullMethod: "Full methodology", playAgain: "Play Again", postX: "Post to X", saveImg: "↓ Save Image", scored: "How was this scored?", letsFind: "Let's Find Out", handle: "Your X handle", language: "Language", recentAttempts: "RECENT ATTEMPTS" },
-    es: { chalkLine1: "¿Eres más listo que un", chalkLine2: "alumno de 5°", chalkLine3: "de Alpha?", continue: "Continuar", submit: "Enviar", noCalc: "Sin calculadora", sciCalc: "Calculadora científica OK", graphCalc: "Calculadora gráfica OK", placeholder: "Escribe tu respuesta...", performAt: "Los estudiantes Alpha rinden a nivel de", estGlobal: "Aprox. el {pct} de la población mundial no puede rendir a este nivel", dataMethod: "Datos y Metodología", fullMethod: "Metodología completa", playAgain: "Jugar de nuevo", postX: "Publicar en X", saveImg: "↓ Guardar imagen", scored: "¿Cómo se calificó?", letsFind: "Descúbrelo", handle: "Tu usuario de X", language: "Idioma", recentAttempts: "INTENTOS RECIENTES" },
-    fr: { chalkLine1: "Es-tu plus intelligent qu'un", chalkLine2: "élève de CM2", chalkLine3: "chez Alpha ?", continue: "Continuer", submit: "Soumettre", noCalc: "Pas de calculatrice", sciCalc: "Calculatrice scientifique OK", graphCalc: "Calculatrice graphique OK", placeholder: "Tapez votre réponse...", performAt: "Les élèves Alpha performent au niveau de", estGlobal: "Env. {pct} de la population mondiale ne peut pas atteindre ce niveau", dataMethod: "Données et Méthodologie", fullMethod: "Méthodologie complète", playAgain: "Rejouer", postX: "Publier sur X", saveImg: "↓ Sauvegarder", scored: "Comment c'est noté ?", letsFind: "Découvrons", handle: "Votre pseudo X", language: "Langue", recentAttempts: "TENTATIVES RÉCENTES" },
-    de: { chalkLine1: "Bist du schlauer als ein", chalkLine2: "Fünftklässler", chalkLine3: "bei Alpha?", continue: "Weiter", submit: "Absenden", noCalc: "Kein Taschenrechner", sciCalc: "Wissenschaftlicher TR OK", graphCalc: "Grafik-TR OK", placeholder: "Antwort eingeben...", performAt: "Alpha-Schüler leisten auf dem Niveau von", estGlobal: "Ca. {pct} der Weltbevölkerung kann dieses Niveau nicht erreichen", dataMethod: "Daten & Methodik", fullMethod: "Vollständige Methodik", playAgain: "Nochmal spielen", postX: "Auf X posten", saveImg: "↓ Bild speichern", scored: "Wie wurde bewertet?", letsFind: "Finden wir's heraus", handle: "Dein X-Handle", language: "Sprache", recentAttempts: "LETZTE VERSUCHE" },
-    pt: { chalkLine1: "Você é mais esperto que um", chalkLine2: "aluno do 5° ano", chalkLine3: "da Alpha?", continue: "Continuar", submit: "Enviar", noCalc: "Sem calculadora", sciCalc: "Calculadora científica OK", graphCalc: "Calculadora gráfica OK", placeholder: "Digite sua resposta...", performAt: "Alunos Alpha performam no nível de", estGlobal: "Aprox. {pct} da população mundial não consegue performar neste nível", dataMethod: "Dados e Metodologia", fullMethod: "Metodologia completa", playAgain: "Jogar novamente", postX: "Postar no X", saveImg: "↓ Salvar imagem", scored: "Como foi pontuado?", letsFind: "Vamos descobrir", handle: "Seu @ do X", language: "Idioma", recentAttempts: "TENTATIVAS RECENTES" },
-    zh: { chalkLine1: "你比Alpha的", chalkLine2: "五年级学生", chalkLine3: "更聪明吗？", continue: "继续", submit: "提交", noCalc: "不能使用计算器", sciCalc: "允许科学计算器", graphCalc: "允许图形计算器", placeholder: "输入你的答案...", performAt: "Alpha学生的表现水平为", estGlobal: "全球约{pct}的人口无法达到这个水平", dataMethod: "数据与方法论", fullMethod: "完整方法论", playAgain: "再玩一次", postX: "发布到X", saveImg: "↓ 保存图片", scored: "如何评分？", letsFind: "来试试", handle: "你的X账号", language: "语言", recentAttempts: "最近尝试" },
-    ja: { chalkLine1: "Alphaの", chalkLine2: "5年生", chalkLine3: "より賢い？", continue: "続ける", submit: "送信", noCalc: "電卓禁止", sciCalc: "関数電卓OK", graphCalc: "グラフ電卓OK", placeholder: "答えを入力...", performAt: "Alphaの生徒のレベル：", estGlobal: "世界人口の約{pct}がこのレベルに達していません", dataMethod: "データと方法論", fullMethod: "詳細な方法論", playAgain: "もう一度", postX: "Xに投稿", saveImg: "↓ 画像保存", scored: "採点方法", letsFind: "挑戦する", handle: "X アカウント", language: "言語", recentAttempts: "最近の挑戦" },
-    ko: { chalkLine1: "Alpha의", chalkLine2: "5학년", chalkLine3: "보다 똑똑한가?", continue: "계속", submit: "제출", noCalc: "계산기 없음", sciCalc: "공학 계산기 OK", graphCalc: "그래프 계산기 OK", placeholder: "답을 입력하세요...", performAt: "Alpha 학생들의 수준:", estGlobal: "세계 인구의 약 {pct}가 이 수준에 도달하지 못합니다", dataMethod: "데이터 및 방법론", fullMethod: "전체 방법론", playAgain: "다시 플레이", postX: "X에 게시", saveImg: "↓ 이미지 저장", scored: "채점 방법", letsFind: "알아보자", handle: "X 핸들", language: "언어", recentAttempts: "최근 시도" },
-    ar: { chalkLine1: "هل أنت أذكى من", chalkLine2: "طالب صف خامس", chalkLine3: "في ألفا؟", continue: "متابعة", submit: "إرسال", noCalc: "بدون آلة حاسبة", sciCalc: "آلة حاسبة علمية مسموح", graphCalc: "آلة حاسبة بيانية مسموح", placeholder: "اكتب إجابتك...", performAt: "طلاب ألفا يؤدون بمستوى", estGlobal: "ما يقدر بـ {pct} من سكان العالم لا يستطيعون الأداء بهذا المستوى", dataMethod: "البيانات والمنهجية", fullMethod: "المنهجية الكاملة", playAgain: "العب مرة أخرى", postX: "نشر على X", saveImg: "↓ حفظ الصورة", scored: "كيف تم التقييم؟", letsFind: "لنكتشف", handle: "حسابك على X", language: "اللغة", recentAttempts: "المحاولات الأخيرة" },
-    hi: { chalkLine1: "क्या आप Alpha के", chalkLine2: "5वीं कक्षा", chalkLine3: "के छात्र से होशियार हैं?", continue: "जारी रखें", submit: "जमा करें", noCalc: "कैलकुलेटर नहीं", sciCalc: "वैज्ञानिक कैलकुलेटर OK", graphCalc: "ग्राफिंग कैलकुलेटर OK", placeholder: "अपना उत्तर टाइप करें...", performAt: "Alpha छात्र इस स्तर पर प्रदर्शन करते हैं:", estGlobal: "विश्व जनसंख्या का अनु. {pct} इस स्तर पर प्रदर्शन नहीं कर सकता", dataMethod: "डेटा और कार्यप्रणाली", fullMethod: "पूर्ण कार्यप्रणाली", playAgain: "फिर से खेलें", postX: "X पर पोस्ट करें", saveImg: "↓ छवि सहेजें", scored: "स्कोर कैसे हुआ?", letsFind: "पता करें", handle: "आपका X हैंडल", language: "भाषा", recentAttempts: "हाल के प्रयास" },
-    ru: { chalkLine1: "Ты умнее", chalkLine2: "пятиклассника", chalkLine3: "из Alpha?", continue: "Продолжить", submit: "Отправить", noCalc: "Без калькулятора", sciCalc: "Научный калькулятор OK", graphCalc: "Графический калькулятор OK", placeholder: "Введите ответ...", performAt: "Ученики Alpha работают на уровне", estGlobal: "Ок. {pct} населения мира не может достичь этого уровня", dataMethod: "Данные и методология", fullMethod: "Полная методология", playAgain: "Играть снова", postX: "Опубликовать в X", saveImg: "↓ Сохранить", scored: "Как оценивалось?", letsFind: "Узнаем", handle: "Ваш X", language: "Язык", recentAttempts: "ПОСЛЕДНИЕ ПОПЫТКИ" },
-    tr: { chalkLine1: "Alpha'daki bir", chalkLine2: "5. sınıf öğrencisinden", chalkLine3: "daha mı akıllısın?", continue: "Devam", submit: "Gönder", noCalc: "Hesap makinesi yok", sciCalc: "Bilimsel hesap makinesi OK", graphCalc: "Grafik hesap makinesi OK", placeholder: "Cevabınızı yazın...", performAt: "Alpha öğrencileri şu seviyede performans gösteriyor:", estGlobal: "Dünya nüfusunun tahminen {pct}'i bu seviyede performans gösteremiyor", dataMethod: "Veri ve Metodoloji", fullMethod: "Tam metodoloji", playAgain: "Tekrar oyna", postX: "X'e gönder", saveImg: "↓ Resmi kaydet", scored: "Nasıl puanlandı?", letsFind: "Öğrenelim", handle: "X kullanıcı adınız", language: "Dil", recentAttempts: "SON DENEMELER" },
-  };
-
-  let currentLang = "en";
-  let userHandle = "";
-
-  function t(key) {
-    return (UI_STRINGS[currentLang] || UI_STRINGS.en)[key] || UI_STRINGS.en[key] || key;
-  }
-
-  function setChalkText(line1, line2, line3) {
-    [["#chalk-line-1", line1], ["#chalk-line-2", line2], ["#chalk-line-3", line3]].forEach(([sel, text]) => {
-      const el = $(sel);
-      el.innerHTML = "";
-      [...text].forEach(ch => {
-        const span = document.createElement("span");
-        span.className = ch === " " ? "chalk-char space" : "chalk-char";
-        span.textContent = ch === " " ? "\u00A0" : ch;
-        span.style.animationDelay = "0ms";
-        el.appendChild(span);
-      });
-    });
-  }
-
-  function applyLang() {
-    currentLang = $("#lang-select").value;
-    setChalkText(t("chalkLine1"), t("chalkLine2"), t("chalkLine3"));
-    $("#btn-start").textContent = t("letsFind");
-    $(".lb-label").textContent = t("recentAttempts");
-    $('[for="x-handle"]').textContent = t("handle");
-    $('[for="lang-select"]').textContent = t("language");
-    $("#free-input").placeholder = t("placeholder");
-    $("#btn-submit-free").textContent = t("submit");
-    $("#gt-continue").textContent = t("continue");
-    $("#btn-restart").textContent = t("playAgain");
-    $(".methodology summary").textContent = t("scored");
-  }
-
-  $("#lang-select").addEventListener("change", applyLang);
-
-  // enable/disable start button based on handle input
-  $("#x-handle").addEventListener("input", () => {
-    $("#btn-start").disabled = !$("#x-handle").value.trim();
-  });
-  $("#x-handle").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && $("#x-handle").value.trim()) $("#btn-start").click();
-  });
 
   // ═══════════ START ═══════════
 
