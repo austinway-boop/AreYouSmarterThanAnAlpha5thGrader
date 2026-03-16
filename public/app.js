@@ -107,7 +107,7 @@
 
   async function checkAuth() {
     try {
-      const res = await fetch("/auth/me");
+      const res = await fetch("/api/auth/me");
       if (res.ok) {
         authedUser = await res.json();
         $("#auth-prompt").classList.add("hidden");
