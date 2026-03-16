@@ -92,9 +92,7 @@
     setChalkText(t("chalkLine1"), t("chalkLine2"), t("chalkLine3"));
     $("#btn-start").textContent = t("letsFind");
     $(".lb-label").textContent = t("recentAttempts");
-    $('[for="x-handle"]').textContent = t("handle");
     $('[for="lang-select"]').textContent = t("language");
-    $("#x-handle").placeholder = "@yourhandle";
     $("#free-input").placeholder = t("placeholder");
     $("#btn-submit-free").textContent = t("submit");
     $("#gt-continue").textContent = t("continue");
@@ -105,12 +103,22 @@
 
   $("#lang-select").addEventListener("change", applyLang);
 
-  $("#x-handle").addEventListener("input", () => {
-    $("#btn-start").disabled = !$("#x-handle").value.trim();
-  });
-  $("#x-handle").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && $("#x-handle").value.trim()) $("#btn-start").click();
-  });
+  let authedUser = null;
+
+  async function checkAuth() {
+    try {
+      const res = await fetch("/auth/me");
+      if (res.ok) {
+        authedUser = await res.json();
+        $("#auth-prompt").classList.add("hidden");
+        $("#auth-user").classList.remove("hidden");
+        $("#auth-avatar").src = authedUser.avatar || "";
+        $("#auth-handle").textContent = authedUser.handle;
+        userHandle = authedUser.handle;
+        $("#btn-start").disabled = false;
+      }
+    } catch (e) {}
+  }
 
   let chalkAnimId = null;
   let chalkDone = false;
@@ -224,29 +232,31 @@
 
   // ═══════════ LEADERBOARD ═══════════
 
-  const LEADERBOARD = [
-    { handle: "@naval", grade: "4" },
-    { handle: "@sophiaAI_", grade: "3" },
-    { handle: "@balaboredd", grade: "3" },
-    { handle: "@jack", grade: "1" },
-    { handle: "@chamath", grade: "1" },
-    { handle: "@lexfridman", grade: "2" },
-    { handle: "@garaboredd", grade: "k" },
-    { handle: "@elonmusk", grade: "k" },
-    { handle: "@pmarca", grade: "k" },
-    { handle: "@david_perell", grade: "k" },
-  ];
+  let leaderboardData = [];
 
-  function lbResult(grade) {
+  function lbResult(grade, passedAll) {
+    if (passedAll) return "Smarter than all!";
     const label = GRADE_LABELS[grade] || grade;
     return `${t("notSmarterThan")} ${label}`;
+  }
+
+  async function fetchLeaderboard() {
+    try {
+      const res = await fetch("/api/leaderboard");
+      if (res.ok) leaderboardData = await res.json();
+    } catch (e) {}
+    renderLeaderboard();
   }
 
   function renderLeaderboard() {
     const medals = ["🥇", "🥈", "🥉"];
     const container = $("#lb-rows");
     container.innerHTML = "";
-    LEADERBOARD.forEach((entry, i) => {
+    if (leaderboardData.length === 0) {
+      container.innerHTML = '<div class="lb-empty">No attempts yet. Be the first!</div>';
+      return;
+    }
+    leaderboardData.forEach((entry, i) => {
       const rank = i + 1;
       const badge = rank <= 3 ? medals[rank - 1] : rank;
       const cls = rank <= 3 ? ` lb-top` : "";
@@ -255,13 +265,14 @@
           <span class="lb-rank">${badge}</span>
           <div class="lb-info">
             <span class="lb-handle">${entry.handle}</span>
-            <span class="lb-result">${lbResult(entry.grade)}</span>
+            <span class="lb-result">${lbResult(entry.grade_reached, entry.passed_all)}</span>
           </div>
         </div>`;
     });
   }
 
-  renderLeaderboard();
+  fetchLeaderboard();
+  checkAuth();
 
   // auto-run on load
   runChalkAnimation();
@@ -270,20 +281,8 @@
 
   $("#btn-start").addEventListener("click", (e) => {
     e.stopPropagation();
-    const raw = $("#x-handle").value.trim();
-    const existing = $(".gate-error");
-    if (existing) existing.remove();
+    if (!authedUser) return;
 
-    if (!raw) {
-      const err = document.createElement("p");
-      err.className = "gate-error";
-      err.textContent = "Enter your X handle to continue";
-      $("#x-handle").parentElement.appendChild(err);
-      $("#x-handle").focus();
-      return;
-    }
-
-    userHandle = raw.startsWith("@") ? raw : "@" + raw;
     currentLang = $("#lang-select").value;
 
     state = {
@@ -292,6 +291,7 @@
       bestStreak: 0, locked: false, ended: false,
     };
     showScreen("quiz");
+    lastShownGrade = null;
     renderQuestion();
   });
 
@@ -606,6 +606,28 @@
     return { highestPassed, gradeCorrect, gradeTotal };
   }
 
+  async function saveResults(highestPassed, passedAll, totalCorrect, totalQuestions) {
+    if (!authedUser) return;
+    try {
+      await fetch("/api/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grade_reached: highestPassed || "0",
+          passed_all: passedAll,
+          total_correct: totalCorrect,
+          total_questions: totalQuestions,
+          best_streak: state.bestStreak,
+          language: currentLang,
+          answers: state.answers,
+        }),
+      });
+      fetchLeaderboard();
+    } catch (e) {
+      console.error("Failed to save results:", e);
+    }
+  }
+
   function showResults() {
     showScreen("results");
     const { highestPassed, gradeCorrect, gradeTotal } = computeGrade();
@@ -674,6 +696,8 @@
     if (passedAll && typeof confetti !== "undefined") {
       confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
     }
+
+    saveResults(highestPassed, passedAll, totalCorrect, state.answers.length);
   }
 
   // ═══════════ SHARE ═══════════

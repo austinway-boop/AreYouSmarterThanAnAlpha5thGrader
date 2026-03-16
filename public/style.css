@@ -161,6 +161,43 @@ body {
   margin-top: -.2rem;
 }
 
+/* X sign-in button */
+.btn-x-signin {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-family: var(--font-body);
+  font-weight: 800; font-size: .85rem;
+  padding: .6rem 1.4rem;
+  background: #000; color: #fff;
+  border: 1px solid #333; border-radius: var(--radius);
+  text-decoration: none;
+  transition: border-color .15s;
+}
+.btn-x-signin:hover { border-color: #555; }
+.btn-x-signin svg { flex-shrink: 0; }
+
+.auth-prompt { text-align: center; }
+
+.auth-user {
+  display: flex; align-items: center; gap: .5rem;
+  justify-content: center;
+}
+
+.auth-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--chalk-faint);
+}
+
+.auth-handle {
+  font-size: .8rem; font-weight: 700;
+  color: var(--chalk);
+}
+
+.lb-empty {
+  padding: .6rem; text-align: center;
+  font-size: .7rem; font-weight: 600;
+  color: var(--chalk-dim);
+}
+
 /* ═══════════ CTA BUTTON ═══════════ */
 
 .btn-chalk-cta {

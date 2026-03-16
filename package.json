@@ -1,0 +1,28 @@
+{
+  "name": "smarterthan5thgrade",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/austinway-boop/AreYouSmarterThanAnAlpha5thGrader.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/austinway-boop/AreYouSmarterThanAnAlpha5thGrader/issues"
+  },
+  "homepage": "https://github.com/austinway-boop/AreYouSmarterThanAnAlpha5thGrader#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "passport": "^0.7.0",
+    "passport-twitter": "^1.0.4",
+    "pg": "^8.20.0"
+  }
+}
