@@ -133,21 +133,41 @@ app.get("/api/auth/twitter/callback", (req, res) => {
       const screenName = results.screen_name;
       const xHandle = "@" + screenName;
 
+      // Fetch profile image using the access token (v1.1 API, best-effort)
+      let xAvatar = "";
+      try {
+        const profileData = await new Promise((resolve) => {
+          oa.get(
+            `https://api.twitter.com/1.1/users/show.json?screen_name=${screenName}`,
+            accessToken, accessTokenSecret,
+            (pErr, pData) => {
+              if (pErr) { resolve(null); return; }
+              try { resolve(JSON.parse(pData)); } catch { resolve(null); }
+            }
+          );
+        });
+        if (profileData?.profile_image_url_https) {
+          xAvatar = profileData.profile_image_url_https.replace("_normal", "");
+        }
+      } catch (e) {
+        console.error("Profile fetch error (non-fatal):", e.message);
+      }
+
       try {
         // Upsert user in DB
         const dbRes = await pool.query(
           `INSERT INTO users (x_id, x_handle, x_name, x_avatar)
            VALUES ($1, $2, $3, $4)
-           ON CONFLICT (x_id) DO UPDATE SET x_handle=$2, x_name=$3
+           ON CONFLICT (x_id) DO UPDATE SET x_handle=$2, x_name=$3, x_avatar=$4
            RETURNING *`,
-          [xId, xHandle, screenName, ""]
+          [xId, xHandle, screenName, xAvatar]
         );
 
         const user = {
           id: dbRes.rows[0].id,
           handle: xHandle,
           name: screenName,
-          avatar: "",
+          avatar: xAvatar,
         };
 
         // Clear the temp cookie, set the auth cookie
