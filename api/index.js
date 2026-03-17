@@ -1,156 +1,188 @@
 const express = require("express");
-const session = require("express-session");
+const { OAuth } = require("oauth");
 const crypto = require("crypto");
+const cookieParser = require("cookie-parser");
 const { pool, initDB } = require("./db");
 
 const app = express();
 app.use(express.json());
-
+app.use(cookieParser());
 app.set("trust proxy", 1);
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "fallback-secret",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: "lax",
-    },
-  })
-);
 
 let dbReady = false;
 initDB().then(() => { dbReady = true; }).catch(console.error);
 
-const CLIENT_ID = process.env.TWITTER_CLIENT_ID || process.env.TWITTER_CONSUMER_KEY;
-const CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET || process.env.TWITTER_CONSUMER_SECRET;
+const CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
+const CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
+const COOKIE_SECRET = process.env.SESSION_SECRET || "fallback-secret";
 
-function base64url(buf) {
-  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+const oa = new OAuth(
+  "https://api.x.com/oauth/request_token",
+  "https://api.x.com/oauth/access_token",
+  CONSUMER_KEY,
+  CONSUMER_SECRET,
+  "1.0A",
+  CALLBACK_URL,
+  "HMAC-SHA1"
+);
+
+// Encrypt/decrypt helpers for storing oauth_token_secret in a cookie
+function encrypt(text) {
+  const key = crypto.scryptSync(COOKIE_SECRET, "salt", 32);
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return iv.toString("hex") + ":" + encrypted;
 }
 
-// Step 1: redirect user to X authorization page
-app.get("/api/auth/twitter", (req, res) => {
-  const state = base64url(crypto.randomBytes(32));
-  const codeVerifier = base64url(crypto.randomBytes(48));
+function decrypt(text) {
+  const key = crypto.scryptSync(COOKIE_SECRET, "salt", 32);
+  const [ivHex, encrypted] = text.split(":");
+  const iv = Buffer.from(ivHex, "hex");
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  let decrypted = decipher.update(encrypted, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+}
 
-  req.session.oauthState = state;
-  req.session.codeVerifier = codeVerifier;
-
-  const codeChallenge = base64url(crypto.createHash("sha256").update(codeVerifier).digest());
-
-  const params = new URLSearchParams({
-    response_type: "code",
-    client_id: CLIENT_ID,
-    redirect_uri: CALLBACK_URL,
-    scope: "users.read tweet.read offline.access",
-    state: state,
-    code_challenge: codeChallenge,
-    code_challenge_method: "S256",
+// Signed cookie for authenticated user (stateless session replacement)
+function setUserCookie(res, user) {
+  const payload = JSON.stringify(user);
+  const encrypted = encrypt(payload);
+  res.cookie("authed_user", encrypted, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+    path: "/",
   });
+}
 
-  const authUrl = `https://x.com/i/oauth2/authorize?${params}`;
-  console.log("OAuth redirect - client_id:", CLIENT_ID?.substring(0, 8) + "...", "callback:", CALLBACK_URL, "verifier_len:", codeVerifier.length);
-
-  req.session.save((err) => {
-    if (err) console.error("Session save error:", err);
-    res.redirect(authUrl);
-  });
-});
-
-// Step 2: handle callback from X
-app.get("/api/auth/twitter/callback", async (req, res) => {
-  const { code, state } = req.query;
-
-  if (!code || state !== req.session.oauthState) {
-    return res.redirect("/?auth_error=1");
-  }
-
+function getUserFromCookie(req) {
+  const val = req.cookies?.authed_user;
+  if (!val) return null;
   try {
-    // Exchange code for access token
-    const tokenRes = await fetch("https://api.x.com/2/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64"),
-      },
-      body: new URLSearchParams({
-        code,
-        grant_type: "authorization_code",
-        redirect_uri: CALLBACK_URL,
-        code_verifier: req.session.codeVerifier,
-      }),
-    });
-
-    if (!tokenRes.ok) {
-      const err = await tokenRes.text();
-      console.error("Token exchange failed:", err);
-      return res.redirect("/?auth_error=1");
-    }
-
-    const tokenData = await tokenRes.json();
-    const accessToken = tokenData.access_token;
-
-    // Fetch user profile
-    const userRes = await fetch("https://api.x.com/2/users/me?user.fields=username,name,profile_image_url", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (!userRes.ok) {
-      console.error("User fetch failed:", await userRes.text());
-      return res.redirect("/?auth_error=1");
-    }
-
-    const userData = await userRes.json();
-    const xId = userData.data.id;
-    const xHandle = "@" + userData.data.username;
-    const xName = userData.data.name;
-    const xAvatar = userData.data.profile_image_url || "";
-
-    // Upsert user in DB
-    const dbRes = await pool.query(
-      `INSERT INTO users (x_id, x_handle, x_name, x_avatar)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (x_id) DO UPDATE SET x_handle=$2, x_name=$3, x_avatar=$4
-       RETURNING *`,
-      [xId, xHandle, xName, xAvatar]
-    );
-
-    req.session.userId = dbRes.rows[0].id;
-    req.session.user = {
-      id: dbRes.rows[0].id,
-      handle: xHandle,
-      name: xName,
-      avatar: xAvatar,
-    };
-
-    res.redirect("/?authenticated=1");
-  } catch (err) {
-    console.error("OAuth callback error:", err);
-    res.redirect("/?auth_error=1");
+    return JSON.parse(decrypt(val));
+  } catch {
+    return null;
   }
+}
+
+// ═══════════ OAUTH 1.0a ROUTES ═══════════
+
+// Step 1: Get request token, redirect to X
+app.get("/api/auth/twitter", (req, res) => {
+  oa.getOAuthRequestToken((err, oauthToken, oauthTokenSecret) => {
+    if (err) {
+      console.error("Request token error:", JSON.stringify(err));
+      return res.status(500).send("Failed to get request token");
+    }
+
+    // Store the secret in an encrypted cookie
+    const encryptedSecret = encrypt(oauthTokenSecret);
+    res.cookie("oauth_token_secret", encryptedSecret, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 10 * 60 * 1000, // 10 min
+      path: "/",
+    });
+
+    res.redirect(`https://api.x.com/oauth/authorize?oauth_token=${oauthToken}`);
+  });
 });
 
+// Step 2: Callback from X after user authorizes
+app.get("/api/auth/twitter/callback", (req, res) => {
+  const { oauth_token, oauth_verifier } = req.query;
+
+  if (!oauth_token || !oauth_verifier) {
+    return res.redirect("/?auth_error=missing_params");
+  }
+
+  // Read the encrypted secret from cookie
+  const encryptedSecret = req.cookies?.oauth_token_secret;
+  if (!encryptedSecret) {
+    console.error("No oauth_token_secret cookie found");
+    return res.redirect("/?auth_error=no_cookie");
+  }
+
+  let oauthTokenSecret;
+  try {
+    oauthTokenSecret = decrypt(encryptedSecret);
+  } catch (e) {
+    console.error("Failed to decrypt oauth_token_secret:", e.message);
+    return res.redirect("/?auth_error=decrypt_failed");
+  }
+
+  // Exchange for access token
+  oa.getOAuthAccessToken(
+    oauth_token,
+    oauthTokenSecret,
+    oauth_verifier,
+    async (err, accessToken, accessTokenSecret, results) => {
+      if (err) {
+        console.error("Access token error:", JSON.stringify(err));
+        return res.redirect("/?auth_error=access_token_failed");
+      }
+
+      const xId = results.user_id;
+      const screenName = results.screen_name;
+      const xHandle = "@" + screenName;
+
+      try {
+        // Upsert user in DB
+        const dbRes = await pool.query(
+          `INSERT INTO users (x_id, x_handle, x_name, x_avatar)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (x_id) DO UPDATE SET x_handle=$2, x_name=$3
+           RETURNING *`,
+          [xId, xHandle, screenName, ""]
+        );
+
+        const user = {
+          id: dbRes.rows[0].id,
+          handle: xHandle,
+          name: screenName,
+          avatar: "",
+        };
+
+        // Clear the temp cookie, set the auth cookie
+        res.clearCookie("oauth_token_secret", { path: "/" });
+        setUserCookie(res, user);
+
+        res.redirect("/?authenticated=1");
+      } catch (dbErr) {
+        console.error("DB error:", dbErr);
+        res.redirect("/?auth_error=db_failed");
+      }
+    }
+  );
+});
+
+// Auth status
 app.get("/api/auth/me", (req, res) => {
-  if (req.session.user) {
-    res.json(req.session.user);
+  const user = getUserFromCookie(req);
+  if (user) {
+    res.json(user);
   } else {
     res.status(401).json({ error: "Not authenticated" });
   }
 });
 
+// Logout
 app.get("/api/auth/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/");
-  });
+  res.clearCookie("authed_user", { path: "/" });
+  res.redirect("/");
 });
 
 // ═══════════ API ROUTES ═══════════
 
 app.post("/api/results", async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: "Not authenticated" });
+  const user = getUserFromCookie(req);
+  if (!user) return res.status(401).json({ error: "Not authenticated" });
 
   const { grade_reached, passed_all, total_correct, total_questions, best_streak, language, answers } = req.body;
 
@@ -158,7 +190,7 @@ app.post("/api/results", async (req, res) => {
     await pool.query(
       `INSERT INTO results (user_id, grade_reached, passed_all, total_correct, total_questions, best_streak, language, answers)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [req.session.user.id, grade_reached, passed_all, total_correct, total_questions, best_streak, language, JSON.stringify(answers)]
+      [user.id, grade_reached, passed_all, total_correct, total_questions, best_streak, language, JSON.stringify(answers)]
     );
     res.json({ ok: true });
   } catch (err) {
