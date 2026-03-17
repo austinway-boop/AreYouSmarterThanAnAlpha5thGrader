@@ -18,8 +18,8 @@ const CALLBACK_URL = process.env.CALLBACK_URL;
 const COOKIE_SECRET = process.env.SESSION_SECRET || "fallback-secret";
 
 const oa = new OAuth(
-  "https://api.x.com/oauth/request_token",
-  "https://api.x.com/oauth/access_token",
+  "https://api.twitter.com/oauth/request_token",
+  "https://api.twitter.com/oauth/access_token",
   CONSUMER_KEY,
   CONSUMER_SECRET,
   "1.0A",
@@ -74,10 +74,11 @@ function getUserFromCookie(req) {
 
 // Step 1: Get request token, redirect to X
 app.get("/api/auth/twitter", (req, res) => {
+  console.log("OAuth1a start - key:", CONSUMER_KEY?.substring(0, 6) + "...", "callback:", CALLBACK_URL);
   oa.getOAuthRequestToken((err, oauthToken, oauthTokenSecret) => {
     if (err) {
       console.error("Request token error:", JSON.stringify(err));
-      return res.status(500).send("Failed to get request token");
+      return res.status(500).json({ error: "Failed to get request token", detail: err?.statusCode, message: err?.data });
     }
 
     // Store the secret in an encrypted cookie
@@ -90,7 +91,7 @@ app.get("/api/auth/twitter", (req, res) => {
       path: "/",
     });
 
-    res.redirect(`https://api.x.com/oauth/authorize?oauth_token=${oauthToken}`);
+    res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${oauthToken}`);
   });
 });
 
