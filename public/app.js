@@ -734,13 +734,13 @@
     const nextInfo = nextGrade ? GRADE_INFO[nextGrade] : null;
     let text;
     if (passedAll) {
-      text = `I just passed every grade at Alpha School 🎓\n\nTheir students are doing college-level calculus and I somehow kept up.\n\n${totalCorrect}/${state.answers.length} correct. Your turn 👇\n\n${QUOTE_TWEET_URL}`;
+      text = `I just passed every grade at @AlphaSchoolATX 🎓\n\nTheir students are doing college-level calculus and I somehow kept up.\n\n${totalCorrect}/${state.answers.length} correct. Your turn 👇\n\n${QUOTE_TWEET_URL}`;
     } else if (!highestPassed) {
-      text = `I just failed 1st grade at Alpha School 💀\n\nTheir 1st graders are doing ${GRADE_INFO["1"].performing} math. I couldn't keep up.\n\nNo way you do better 👇\n\n${QUOTE_TWEET_URL}`;
+      text = `I just failed 1st grade at @AlphaSchoolATX 💀\n\nTheir 1st graders are doing ${GRADE_INFO["1"].performing} math. I couldn't keep up.\n\nNo way you do better 👇\n\n${QUOTE_TWEET_URL}`;
     } else {
       const failedAt = nextGrade ? GRADE_LABELS[nextGrade] : "???";
       const levelDesc = nextInfo ? `${nextInfo.performing} math` : "their curriculum";
-      text = `I just failed ${failedAt} at Alpha School 😬\n\nTheir ${failedAt} students are doing ${levelDesc} and I couldn't keep up.\n\n${totalCorrect}/${state.answers.length} correct. Bet you can't beat me 👇\n\n${QUOTE_TWEET_URL}`;
+      text = `I just failed ${failedAt} at @AlphaSchoolATX 😬\n\nTheir ${failedAt} students are doing ${levelDesc} and I couldn't keep up.\n\n${totalCorrect}/${state.answers.length} correct. Bet you can't beat me 👇\n\n${QUOTE_TWEET_URL}`;
     }
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "width=600,height=450");
 
