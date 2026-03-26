@@ -710,7 +710,7 @@
 
   // ═══════════ SHARE ═══════════
 
-  const QUOTE_TWEET_URL = "https://x.com/AustinA_Way/status/2036211604984111577";
+  const QUOTE_TWEET_URL = "https://x.com/AustinA_Way/status/2037283138712289407";
 
   $("#btn-share-x").addEventListener("click", () => {
     const { highestPassed } = computeGrade();
