@@ -715,17 +715,18 @@
     const passedIdx = highestPassed ? QUIZ_GRADES.indexOf(highestPassed) : -1;
     const passedAll = passedIdx === QUIZ_GRADES.length - 1;
     const nextGrade = QUIZ_GRADES[passedIdx + 1];
-    const pct = GRADE_INFO[highestPassed || "1"]?.globalPct || "";
+    const nextInfo = nextGrade ? GRADE_INFO[nextGrade] : null;
     let text;
     if (passedAll) {
-      text = `I just passed every grade at Alpha School 🎓\n\n${totalCorrect}/${state.answers.length} correct\n\nApparently smarter than 99.7% of the world population. Your turn 👇`;
+      text = `I just passed every grade at Alpha School 🎓\n\nTheir students are doing college-level calculus and I somehow kept up.\n\n${totalCorrect}/${state.answers.length} correct. Your turn 👇\n\n${QUOTE_TWEET_URL}`;
     } else if (!highestPassed) {
-      text = `I just failed 1st grade at Alpha School 💀\n\nCouldn't even get past what their youngest students learn.\n\nNo way you do better 👇`;
+      text = `I just failed 1st grade at Alpha School 💀\n\nTheir 1st graders are doing ${GRADE_INFO["1"].performing} math. I couldn't keep up.\n\nNo way you do better 👇\n\n${QUOTE_TWEET_URL}`;
     } else {
       const failedAt = nextGrade ? GRADE_LABELS[nextGrade] : "???";
-      text = `I just failed ${failedAt} at Alpha School 😬\n\n${totalCorrect}/${state.answers.length} correct — ${pct ? `smarter than ${pct} of the world but ` : ""}not smarter than their students.\n\nBet you can't beat me 👇`;
+      const levelDesc = nextInfo ? `${nextInfo.performing} math` : "their curriculum";
+      text = `I just failed ${failedAt} at Alpha School 😬\n\nTheir ${failedAt} students are doing ${levelDesc} and I couldn't keep up.\n\n${totalCorrect}/${state.answers.length} correct. Bet you can't beat me 👇\n\n${QUOTE_TWEET_URL}`;
     }
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(QUOTE_TWEET_URL)}`, "_blank", "width=600,height=450");
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "width=600,height=450");
 
     // Unlock leaderboard after sharing
     const lbWrapper = $("#results-lb-wrapper");
