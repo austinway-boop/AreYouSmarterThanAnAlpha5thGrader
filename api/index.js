@@ -294,13 +294,16 @@ app.get("/api/leaderboard", async (req, res) => {
         r.total_correct,
         r.total_questions,
         r.created_at
-      FROM results r
-      JOIN users u ON r.user_id = u.id
-      ORDER BY u.id, r.created_at DESC
+      FROM users u
+      LEFT JOIN results r ON r.user_id = u.id
+      ORDER BY u.id, r.created_at DESC NULLS LAST
     `);
 
     const gradeRank = { "11": 5, "7": 4, "5": 3, "3": 2, "1": 1, "0": 0 };
     const sorted = result.rows.sort((a, b) => {
+      const aPlayed = a.grade_reached != null;
+      const bPlayed = b.grade_reached != null;
+      if (aPlayed !== bPlayed) return bPlayed - aPlayed;
       const fa = a.followers_count || 0;
       const fb = b.followers_count || 0;
       if (fb !== fa) return fb - fa;

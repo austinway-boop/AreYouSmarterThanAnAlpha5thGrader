@@ -156,7 +156,11 @@
           const topCls = rank <= 3 ? " lb-top" : "";
           const resultLabel = entry.passed_all
             ? "Smarter than all!"
-            : "Not smarter than " + (GRADE_LABELS[entry.grade_reached] || "1st Grade");
+            : entry.grade_reached == null
+              ? "Not smart enough to start the exam"
+              : entry.grade_reached === "0"
+                ? "Not smarter than a 1st Grader"
+                : "Not smarter than " + (GRADE_LABELS[entry.grade_reached] || "1st Grade");
           const resultCls = entry.passed_all ? "passed" : "failed";
           const avatar = entry.avatar
             ? `<img class="lb-avatar" src="${entry.avatar}" alt="" />`
