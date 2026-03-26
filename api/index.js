@@ -337,18 +337,8 @@ app.get("/api/leaderboard", async (req, res) => {
       ORDER BY u.id, r.created_at DESC NULLS LAST
     `);
 
-    const gradeRank = { "11": 5, "7": 4, "5": 3, "3": 2, "1": 1, "0": 0 };
     const sorted = result.rows.sort((a, b) => {
-      const aPlayed = a.grade_reached != null;
-      const bPlayed = b.grade_reached != null;
-      if (aPlayed !== bPlayed) return bPlayed - aPlayed;
-      const fa = a.followers_count || 0;
-      const fb = b.followers_count || 0;
-      if (fb !== fa) return fb - fa;
-      const ra = a.passed_all ? 99 : (gradeRank[a.grade_reached] || 0);
-      const rb = b.passed_all ? 99 : (gradeRank[b.grade_reached] || 0);
-      if (rb !== ra) return rb - ra;
-      return (b.total_correct || 0) - (a.total_correct || 0);
+      return (b.followers_count || 0) - (a.followers_count || 0);
     });
 
     res.json(sorted.slice(0, 20));
