@@ -243,7 +243,7 @@
   let leaderboardData = [];
 
   function lbResult(grade, passedAll) {
-    if (passedAll) return "Smarter than all!";
+    if (passedAll) return "Smarter than an Alpha 11th Grader";
     if (grade == null) return "Not smart enough to start the exam";
     if (grade === "0") return `${t("notSmarterThan")} a 1st Grader`;
     const label = GRADE_LABELS[grade] || "1st Grade";
