@@ -154,13 +154,14 @@
           const rank = i + 1;
           const badge = rank <= 3 ? medals[rank - 1] : rank;
           const topCls = rank <= 3 ? " lb-top" : "";
+          const nextMap = { "1": "3", "3": "5", "5": "7", "7": "11" };
           const resultLabel = entry.passed_all
             ? "As smart as an Alpha 11th Grader"
             : entry.grade_reached == null
               ? "Not smart enough to start the exam"
               : entry.grade_reached === "0"
                 ? "Not smarter than a 1st Grader"
-                : "Not smarter than " + (GRADE_LABELS[entry.grade_reached] || "1st Grade");
+                : "Not smarter than " + (GRADE_LABELS[nextMap[entry.grade_reached]] || GRADE_LABELS[entry.grade_reached] || "1st Grade");
           const resultCls = entry.passed_all ? "passed" : "failed";
           const avatar = entry.avatar
             ? `<img class="lb-avatar" src="${entry.avatar}" alt="" />`

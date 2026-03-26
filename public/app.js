@@ -246,7 +246,9 @@
     if (passedAll) return "As smart as an Alpha 11th Grader";
     if (grade == null) return "Not smart enough to start the exam";
     if (grade === "0") return `${t("notSmarterThan")} a 1st Grader`;
-    const label = GRADE_LABELS[grade] || "1st Grade";
+    const nextMap = { "1": "3", "3": "5", "5": "7", "7": "11" };
+    const failedGrade = nextMap[grade];
+    const label = failedGrade ? GRADE_LABELS[failedGrade] : GRADE_LABELS[grade];
     return `${t("notSmarterThan")} ${label}`;
   }
 
