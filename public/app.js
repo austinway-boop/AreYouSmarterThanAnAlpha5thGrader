@@ -115,12 +115,15 @@
         userHandle = authedUser.handle;
         $("#btn-start").disabled = false;
       } else if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-        authedUser = { id: 0, handle: "@localhost", name: "Local Dev", avatar: "" };
-        userHandle = "@localhost";
-        $("#auth-prompt").classList.add("hidden");
-        $("#auth-user").classList.remove("hidden");
-        $("#auth-handle").textContent = "@localhost";
-        $("#btn-start").disabled = false;
+        const devRes = await fetch("/api/auth/dev");
+        if (devRes.ok) {
+          authedUser = await devRes.json();
+          userHandle = authedUser.handle;
+          $("#auth-prompt").classList.add("hidden");
+          $("#auth-user").classList.remove("hidden");
+          $("#auth-handle").textContent = authedUser.handle;
+          $("#btn-start").disabled = false;
+        }
       }
     } catch (e) {}
   }

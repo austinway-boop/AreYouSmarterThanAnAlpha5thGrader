@@ -183,6 +183,28 @@ app.get("/api/auth/twitter/callback", (req, res) => {
   );
 });
 
+// Localhost dev auto-login
+app.get("/api/auth/dev", async (req, res) => {
+  const host = req.hostname;
+  if (host !== "localhost" && host !== "127.0.0.1") {
+    return res.status(403).json({ error: "Dev auth only available on localhost" });
+  }
+  try {
+    const dbRes = await pool.query(
+      `INSERT INTO users (x_id, x_handle, x_name, x_avatar)
+       VALUES ('dev_local', '@localhost', 'Local Dev', '')
+       ON CONFLICT (x_id) DO UPDATE SET x_handle='@localhost'
+       RETURNING *`
+    );
+    const user = { id: dbRes.rows[0].id, handle: "@localhost", name: "Local Dev", avatar: "" };
+    setUserCookie(res, user);
+    res.json(user);
+  } catch (err) {
+    console.error("Dev auth error:", err);
+    res.status(500).json({ error: "Dev auth failed" });
+  }
+});
+
 // Auth status
 app.get("/api/auth/me", (req, res) => {
   const user = getUserFromCookie(req);
