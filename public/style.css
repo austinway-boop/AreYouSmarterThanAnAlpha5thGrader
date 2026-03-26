@@ -297,6 +297,13 @@ body {
 }
 .lb-row.lb-you .lb-handle { color: var(--green); }
 
+.lb-fc {
+  font-size: .55rem; font-weight: 700;
+  color: var(--chalk-dim);
+  margin-left: .3rem;
+  opacity: .6;
+}
+
 .lb-rank {
   width: 1.4rem; flex-shrink: 0;
   font-size: .7rem; font-weight: 800;

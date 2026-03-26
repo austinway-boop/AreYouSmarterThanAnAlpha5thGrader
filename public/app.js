@@ -269,11 +269,16 @@
       const badge = rank <= 3 ? medals[rank - 1] : rank;
       const cls = rank <= 3 ? ` lb-top` : "";
       const isYou = authedUser && entry.handle === authedUser.handle;
+      const fc = entry.followers_count;
+      const fcStr = fc >= 1000000 ? (fc/1000000).toFixed(1).replace(/\.0$/,"") + "M"
+                  : fc >= 1000 ? (fc/1000).toFixed(1).replace(/\.0$/,"") + "K"
+                  : fc > 0 ? String(fc) : "";
+      const fcTag = fcStr ? ` <span class="lb-fc">${fcStr}</span>` : "";
       html += `
         <div class="lb-row${cls}${isYou ? " lb-you" : ""}">
           <span class="lb-rank">${badge}</span>
           <div class="lb-info">
-            <span class="lb-handle">${entry.handle}${isYou ? " (you)" : ""}</span>
+            <span class="lb-handle">${entry.handle}${fcTag}${isYou ? " (you)" : ""}</span>
             <span class="lb-result">${lbResult(entry.grade_reached, entry.passed_all)}</span>
           </div>
         </div>`;
