@@ -120,18 +120,6 @@
     } catch (e) {}
   }
 
-  // Also enable start if they type a handle manually
-  const handleInput = $("#x-handle");
-  if (handleInput) {
-    handleInput.addEventListener("input", () => {
-      if (!authedUser) {
-        $("#btn-start").disabled = !handleInput.value.trim();
-      }
-    });
-    handleInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && handleInput.value.trim()) $("#btn-start").click();
-    });
-  }
 
   let chalkAnimId = null;
   let chalkDone = false;
@@ -227,7 +215,6 @@
       gate.classList.remove("hidden");
       gate.classList.add("fade-up");
       $("#btn-start").textContent = t("letsFind");
-      $("#x-handle").focus();
     }, 200);
 
     setTimeout(() => {
@@ -294,11 +281,7 @@
 
   $("#btn-start").addEventListener("click", (e) => {
     e.stopPropagation();
-    if (!authedUser) {
-      const raw = $("#x-handle")?.value?.trim();
-      if (!raw) return;
-      userHandle = raw.startsWith("@") ? raw : "@" + raw;
-    }
+    if (!authedUser) return;
 
     currentLang = $("#lang-select").value;
 
