@@ -290,6 +290,7 @@
       gradeStrikes: 0, answers: [], streak: 0,
       bestStreak: 0, locked: false, ended: false,
     };
+    exitShownThisQuiz = false;
     showScreen("quiz");
     lastShownGrade = null;
     renderQuestion();
@@ -729,9 +730,73 @@
     card.classList.remove("capturing");
   });
 
+  // ═══════════ EXIT-INTENT WARNING ═══════════
+
+  let exitShownThisQuiz = false;
+  const exitWarning = $("#exit-warning");
+  const exitVignette = $("#exit-vignette");
+
+  function isQuizActive() {
+    return $("#screen-quiz").classList.contains("active") && !state.ended;
+  }
+
+  function getExitGradeLabel() {
+    const prevIdx = state.gradeIdx - 1;
+    if (prevIdx < 0) return GRADE_LABELS[QUIZ_GRADES[0]] || "1st Grade";
+    return GRADE_LABELS[QUIZ_GRADES[prevIdx]] || QUIZ_GRADES[prevIdx];
+  }
+
+  function showExitWarning() {
+    if (!isQuizActive() || exitShownThisQuiz) return;
+    exitShownThisQuiz = true;
+    $("#exit-warning-grade").textContent = getExitGradeLabel();
+    exitWarning.classList.remove("hidden");
+    exitVignette.classList.remove("active");
+  }
+
+  function hideExitWarning() {
+    exitWarning.classList.add("hidden");
+  }
+
+  $("#exit-warning-stay").addEventListener("click", hideExitWarning);
+
+  document.addEventListener("mouseleave", (e) => {
+    if (e.clientY <= 0 && isQuizActive() && !exitShownThisQuiz) {
+      showExitWarning();
+    }
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isQuizActive() || exitShownThisQuiz) {
+      exitVignette.classList.remove("active");
+      return;
+    }
+    if (e.clientY < 50) {
+      exitVignette.classList.add("active");
+    } else {
+      exitVignette.classList.remove("active");
+    }
+  });
+
+  function beforeUnloadHandler(e) {
+    if (isQuizActive()) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  }
+  window.addEventListener("beforeunload", beforeUnloadHandler);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && isQuizActive() && !exitShownThisQuiz) {
+      exitShownThisQuiz = true;
+    }
+  });
+
   // ═══════════ RESTART ═══════════
 
   $("#btn-restart").addEventListener("click", () => {
+    exitShownThisQuiz = false;
+    hideExitWarning();
     showScreen("start");
     runChalkAnimation();
   });

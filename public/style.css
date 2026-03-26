@@ -726,6 +726,89 @@ body {
 .r-ok td:last-child { color: var(--green); font-weight: 700; }
 .r-bad td:last-child { color: var(--red); font-weight: 700; }
 
+/* ═══════════ EXIT-INTENT WARNING ═══════════ */
+
+.exit-warning {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn .2s ease;
+}
+
+.exit-warning.hidden { display: none !important; }
+
+.exit-warning-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(180, 30, 30, .55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.exit-warning-card {
+  position: relative; z-index: 1;
+  max-width: 380px; width: 100%;
+  background: linear-gradient(170deg, #2a0a0a 0%, #1a0505 100%);
+  border: 2px solid var(--red);
+  border-radius: 8px;
+  padding: 2rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(248, 113, 113, .3), 0 0 120px rgba(248, 113, 113, .1);
+  animation: exitPop .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes exitPop {
+  from { opacity: 0; transform: scale(.85) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.exit-warning-icon {
+  font-size: 2.5rem;
+  margin-bottom: .5rem;
+}
+
+.exit-warning-title {
+  font-family: var(--font-body);
+  font-weight: 900; font-size: 1.3rem;
+  color: var(--red);
+  margin-bottom: .6rem;
+}
+
+.exit-warning-msg {
+  font-size: .82rem; font-weight: 600;
+  color: rgba(255, 255, 255, .7);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.exit-warning-msg strong {
+  color: #fff;
+  font-weight: 900;
+}
+
+.exit-warning-btn {
+  font-family: var(--font-body);
+  font-weight: 900; font-size: 1rem;
+  padding: .75rem 2.2rem;
+  border: 2px solid var(--red);
+  border-radius: var(--radius);
+  background: var(--red);
+  color: #1a0505;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.exit-warning-btn:hover { background: #fca5a5; transform: scale(1.03); }
+.exit-warning-btn:active { transform: scale(.97); }
+
+/* Red vignette flash on the edges when mouse nears top */
+.exit-vignette {
+  position: fixed; inset: 0; z-index: 9990;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+  background: radial-gradient(ellipse at 50% 0%, rgba(248,113,113,.25) 0%, transparent 60%);
+}
+.exit-vignette.active { opacity: 1; }
+
 /* ═══════════ UTILITY ═══════════ */
 
 .hidden { display: none !important; }

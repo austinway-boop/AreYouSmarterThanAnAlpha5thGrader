@@ -27,6 +27,9 @@
   <!-- Chalk dust / residue overlay -->
   <div class="chalk-dust"></div>
 
+  <!-- Red vignette for exit intent -->
+  <div id="exit-vignette" class="exit-vignette"></div>
+
   <!-- ========== START SCREEN ========== -->
   <div id="screen-start" class="screen active">
     <div class="start-container">
@@ -195,6 +198,19 @@
     </details>
 
     <button id="btn-restart" class="btn-chalk" style="margin-top:1.5rem;">Play Again</button>
+  </div>
+
+  <!-- ========== EXIT-INTENT WARNING ========== -->
+  <div id="exit-warning" class="exit-warning hidden">
+    <div class="exit-warning-backdrop"></div>
+    <div class="exit-warning-card">
+      <div class="exit-warning-icon">⚠️</div>
+      <h2 class="exit-warning-title">Don't leave yet!</h2>
+      <p id="exit-warning-msg" class="exit-warning-msg">
+        If you leave now, your score will be locked at <strong id="exit-warning-grade">1st Grade</strong>.
+      </p>
+      <button id="exit-warning-stay" class="exit-warning-btn">Keep Playing</button>
+    </div>
   </div>
 
   <script src="questions.js?v=12"></script>
