@@ -223,6 +223,24 @@ app.get("/api/auth/logout", (req, res) => {
   res.redirect("/");
 });
 
+// Health check / debug
+app.get("/api/health", async (req, res) => {
+  const user = getUserFromCookie(req);
+  let dbOk = false;
+  let userCount = 0;
+  let resultCount = 0;
+  try {
+    const u = await pool.query("SELECT count(*) FROM users");
+    const r = await pool.query("SELECT count(*) FROM results");
+    userCount = parseInt(u.rows[0].count);
+    resultCount = parseInt(r.rows[0].count);
+    dbOk = true;
+  } catch (e) {
+    dbOk = false;
+  }
+  res.json({ dbOk, dbReady, userCount, resultCount, authed: !!user, user: user || null });
+});
+
 // ═══════════ API ROUTES ═══════════
 
 app.post("/api/results", async (req, res) => {
